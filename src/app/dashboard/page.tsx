@@ -1,11 +1,9 @@
 import { FC } from 'react'
 
-interface PageProps {
-  
-}
+interface PageProps {}
 
 const Page: FC<PageProps> = ({}) => {
-  return <div>Page</div>
+  return <div>dashboard</div>
 }
 
 export default Page
