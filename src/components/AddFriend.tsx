@@ -4,7 +4,6 @@ import { FC, useState } from 'react'
 import { cn } from '@/lib/utils'
 import Button from './ui/Button'
 import { addFriendValidator } from '@/lib/validations/add-friend'
-import axios, { AxiosError } from 'axios'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -26,18 +25,19 @@ const AddFriend: FC = () => {
   const addFriend = async (email: string) => {
     try {
       const { email: validatedEmail } = addFriendValidator.parse({ email })
-      await axios.post('/api/friends/add', {
-        email: validatedEmail,
+      const res = await fetch('/api/friends/add', {
+        method: 'POST',
+        body: JSON.stringify({ email: validatedEmail }),
       })
-      setShowSuccessState(true)
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return setError('email', { message: error.message })
-      }
-      if (error instanceof AxiosError) {
-        return setError('email', { message: error.response?.data })
+
+      if (!res.ok) {
+        const { message } = await res.json()
+        return setError('email', { message })
       }
 
+      setShowSuccessState(true)
+    } catch (error) {
+      console.log(error)
       setError('email', { message: 'Something went wrong' })
     }
   }

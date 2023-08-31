@@ -9,7 +9,9 @@ import { z } from 'zod'
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session) return new NextResponse('Unauthorized', { status: 401 })
+    if (!session) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    }
 
     const body = await req.json()
 
@@ -18,11 +20,17 @@ export async function POST(req: Request) {
     const idToAdd = await fetchRedis('get', `user:email:${email}`)
 
     if (!idToAdd) {
-      return new NextResponse('This person does not exist', { status: 400 })
+      return NextResponse.json(
+        { message: 'This person does not exist' },
+        { status: 400 },
+      )
     }
 
     if (idToAdd === session.user.id) {
-      return new NextResponse("Can't add yourself as a friend", { status: 400 })
+      return NextResponse.json(
+        { message: "Can't add yourself as a friend" },
+        { status: 400 },
+      )
     }
 
     const [isAlreadyAdded, isAlreadyFriends] = await Promise.all([
@@ -35,11 +43,14 @@ export async function POST(req: Request) {
     ])
 
     if (isAlreadyAdded) {
-      return new NextResponse('Already added this user', { status: 400 })
+      return NextResponse.json(
+        { message: 'Already added this user' },
+        { status: 400 },
+      )
     }
 
     if (isAlreadyFriends) {
-      return new NextResponse('Already friends', { status: 400 })
+      return NextResponse.json({ message: 'Already friends' }, { status: 400 })
     }
 
     db.sadd(`user:${idToAdd}:incoming_friend_requests`, session.user.id)
@@ -47,11 +58,14 @@ export async function POST(req: Request) {
     return new NextResponse('OK')
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return new NextResponse('Invalid request payload', { status: 422 })
+      return NextResponse.json(
+        { message: 'Invalid request payload' },
+        { status: 422 },
+      )
     }
 
     console.log(error)
 
-    return new NextResponse('Invalid Request', { status: 400 })
+    return NextResponse.json({ message: 'Invalid Request' }, { status: 400 })
   }
 }
