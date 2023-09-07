@@ -1,7 +1,7 @@
 'use client'
 
 import { FC, useState } from 'react'
-import { cn } from '@/lib/utils'
+import { cls } from '@/lib/utils'
 import Button from '@/components/ui/Button'
 import { signIn } from 'next-auth/react'
 import { toast } from 'react-hot-toast'
@@ -23,7 +23,7 @@ const Page: FC<PageProps> = ({}) => {
 
   return (
     <div
-      className={cn([
+      className={cls([
         'flex',
         'min-h-full',
         'items-center',
@@ -35,7 +35,7 @@ const Page: FC<PageProps> = ({}) => {
       ])}
     >
       <div
-        className={cn([
+        className={cls([
           'w-full',
           'flex',
           'flex-col',
@@ -44,10 +44,10 @@ const Page: FC<PageProps> = ({}) => {
           'space-y-8',
         ])}
       >
-        <div className={cn(['flex', 'flex-col', 'items-center', 'gap-8'])}>
+        <div className={cls(['flex', 'flex-col', 'items-center', 'gap-8'])}>
           logo
           <h2
-            className={cn([
+            className={cls([
               'mt-6',
               'text-center',
               'text-3xl',
@@ -62,7 +62,7 @@ const Page: FC<PageProps> = ({}) => {
 
         <Button
           isLoading={isLoading}
-          className={cn(['max-w-sm', 'mx-auto', 'w-full'])}
+          className={cls(['max-w-sm', 'mx-auto', 'w-full'])}
           onClick={loginWithGoogle}
         >
           {!isLoading && (

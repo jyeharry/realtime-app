@@ -1,7 +1,7 @@
 'use client'
 
 import { FC, useState } from 'react'
-import { cn } from '@/lib/utils'
+import { cls } from '@/lib/utils'
 import Button from './ui/Button'
 import { addFriendValidator } from '@/lib/validations/add-friend'
 import { z } from 'zod'
@@ -48,7 +48,7 @@ const AddFriend: FC = () => {
       onSubmit={handleSubmit(({ email }: FormData) => addFriend(email))}
     >
       <label
-        className={cn([
+        className={cls([
           'block',
           'text-sm',
           'font-medium',
@@ -59,10 +59,10 @@ const AddFriend: FC = () => {
       >
         Add friend by email
       </label>
-      <div className={cn(['mt-2', 'flex', 'gap-4'])}>
+      <div className={cls(['mt-2', 'flex', 'gap-4'])}>
         <input
           {...register('email')}
-          className={cn([
+          className={cls([
             'block',
             'w-full',
             'rounded-md',
