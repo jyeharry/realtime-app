@@ -1,5 +1,5 @@
 import FriendRequestCount from '@/components/FriendRequestCount'
-import { Icons, Icon } from '@/components/Icons'
+import Logo from '@/components/Logo'
 import SignOut from '@/components/SignOut'
 import Subtitle from '@/components/Subtitle'
 import { fetchRedis } from '@/helpers/redis'
@@ -67,7 +67,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
         ])}
       >
         <Link href="/dashboard" className="flex h-16 shrink-0 items-center">
-          <Icons.Logo className="h-8 w-auto text-indigo-600" />
+          <Logo className="h-8 w-auto text-indigo-600" />
         </Link>
 
         <Subtitle>Your chats</Subtitle>
@@ -75,7 +75,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
         <nav className="flex flex-1 flex-col">
           <Subtitle>Overview</Subtitle>
 
-          <ul role="list" className="flex flex-1 flex-col gap-2">
+          <ul role="list" className="flex flex-1 flex-col gap-2 mt-2">
             {sidebarOptions.map(({href, text, Icon, Count}, i) => {
               return (
                 <li key={i} className="-mx-2 space-y-1">

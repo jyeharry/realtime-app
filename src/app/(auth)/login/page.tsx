@@ -61,7 +61,7 @@ const Page: FC<PageProps> = ({}) => {
         </div>
 
         <Button
-          isLoading={isLoading}
+          loading={isLoading}
           className={cls(['max-w-sm', 'mx-auto', 'w-full'])}
           onClick={loginWithGoogle}
         >
