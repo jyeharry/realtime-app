@@ -21,7 +21,7 @@ const FriendRequests: FC<FriendRequestsProps> = ({
   )
 
   const acceptFriend = async (senderId: string) => {
-    await fetch('/api/requests/accept', {
+    await fetch('/api/friends/accept', {
       method: 'POST',
       body: JSON.stringify({ id: senderId }),
     })
@@ -30,7 +30,7 @@ const FriendRequests: FC<FriendRequestsProps> = ({
   }
 
   const denyFriend = async (senderId: string) => {
-    await fetch('/api/requests/deny', {
+    await fetch('/api/friends/deny', {
       method: 'POST',
       body: JSON.stringify({ id: senderId }),
     })
@@ -39,10 +39,10 @@ const FriendRequests: FC<FriendRequestsProps> = ({
   }
 
   return (
-    <>
-      {friendRequests.length ? (
-        friendRequests.map((req, i) => (
-          <div key={i} className="flex gap-4 items-center">
+    friendRequests.length ? (
+      <ul>
+        {friendRequests.map((req, i) => (
+          <li key={i} className="flex gap-4 items-center">
             <UserPlus className="text-black" />
             <p className="font-medium text-lg">{req.email}</p>
             <Button
@@ -50,6 +50,7 @@ const FriendRequests: FC<FriendRequestsProps> = ({
               variant="primary"
               rounding="full"
               size="icon"
+              onClick={() => acceptFriend(req.id)}
             >
               <Check className="w-3/4 h-3/4" />
             </Button>
@@ -59,15 +60,16 @@ const FriendRequests: FC<FriendRequestsProps> = ({
               variant="error"
               rounding="full"
               size="icon"
+              onClick={() => denyFriend(req.id)}
             >
               <X className="font-semibold text-white w-3/4 h-3/4" />
             </Button>
-          </div>
-        ))
-      ) : (
+          </li>
+        ))}
+      </ul>
+    ) : (
         <p className="text-sm text-zinc-500">Nothing to show here...</p>
-      )}
-    </>
+      )
   )
 }
 

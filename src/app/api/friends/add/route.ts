@@ -53,7 +53,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Already friends' }, { status: 400 })
     }
 
-    db.sadd(`user:${idToAdd}:incoming_friend_requests`, session.user.id)
+    await db.sadd(`user:${idToAdd}:incoming_friend_requests`, session.user.id)
 
     return new NextResponse('OK')
   } catch (error) {
