@@ -1,4 +1,3 @@
-import { fetchRedis } from '@/helpers/redis'
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { getServerSession } from 'next-auth'
@@ -17,12 +16,8 @@ export async function POST(req: Request) {
     }
 
     const [hasFriendRequest, isAlreadyFriends] = await Promise.all([
-      fetchRedis(
-        'sismember',
-        `user:${session.user.id}:incoming_friend_requests`,
-        newFriendId,
-      ),
-      fetchRedis('sismember', `user:${session.user.id}:friends`, newFriendId),
+      db.sismember(`user:${session.user.id}:incoming_friend_requests`, newFriendId),
+      db.sismember(`user:${session.user.id}:friends`, newFriendId),
     ])
 
     if (!hasFriendRequest) {

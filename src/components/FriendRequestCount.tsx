@@ -21,15 +21,15 @@ const FriendRequestLink: FC<FriendRequestLinkProps> = ({
       {!!unseenRequestCount && (
         <div
           className={cls(
-            'rounded-full',
-            'w-5',
-            'h-5',
-            'text-xs',
-            'flex',
-            'justify-center',
-            'items-center',
-            'text-white',
             'bg-indigo-600',
+            'flex',
+            'h-5',
+            'items-center',
+            'justify-center',
+            'rounded-full',
+            'text-white',
+            'text-xs',
+            'w-5',
           )}
         >
           {unseenRequestCount}

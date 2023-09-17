@@ -1,9 +1,12 @@
 import FriendRequestCount from '@/components/FriendRequestCount'
 import Logo from '@/components/Logo'
+import SidebarChatList from '@/components/SidebarChatList'
+import SidebarLink from '@/components/SidebarLink'
+import SidebarList from '@/components/SidebarList'
 import SignOut from '@/components/SignOut'
-import Subtitle from '@/components/Subtitle'
-import { fetchRedis } from '@/helpers/redis'
+import { getFriendsByUserId } from '@/helpers/getFriendsByUserId'
 import { authOptions } from '@/lib/auth'
+import { db } from '@/lib/db'
 import { cls } from '@/lib/utils'
 import { LucideIcon, User, UserPlus } from 'lucide-react'
 import { getServerSession } from 'next-auth'
@@ -33,7 +36,7 @@ const sidebarOptions: SidebarOption[] = [
     text: 'Friend requests',
     href: '/dashboard/requests',
     Icon: User,
-    Count: FriendRequestCount
+    Count: FriendRequestCount,
   },
 ]
 
@@ -41,16 +44,17 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
   const session = await getServerSession(authOptions)
   if (!session) notFound()
 
+  const friends = await getFriendsByUserId(session.user.id)
+
   const unseenRequestCount = (
-    await fetchRedis<string[]>(
-      'smembers',
+    await db.smembers<string[]>(
       `user:${session.user.id}:incoming_friend_requests`,
     )
   ).length
 
   return (
     <div className="w-full flex h-screen">
-      <div
+      <nav
         className={cls([
           'flex',
           'h-full',
@@ -70,66 +74,46 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
           <Logo className="h-8 w-auto text-indigo-600" />
         </Link>
 
-        <Subtitle>Your chats</Subtitle>
+        {!!friends.length && (
+          <SidebarChatList friends={friends} session={session} />
+        )}
 
-        <nav className="flex flex-1 flex-col">
-          <Subtitle>Overview</Subtitle>
-
-          <ul role="list" className="flex flex-1 flex-col gap-2 mt-2">
-            {sidebarOptions.map(({href, text, Icon, Count}, i) => {
-              return (
-                <li key={i} className="-mx-2 space-y-1">
-                  <Link
-                    href={href}
-                    className={cls([
-                      'text-gray-700',
-                      'hover:text-indigo-600',
-                      'hover:bg-gray-50',
-                      'group',
-                      'flex',
-                      'gap-3',
-                      'rounded-md',
-                      'p-2',
-                      'text-sm',
-                      'leading-6',
-                      'font-semibold',
-                      'items-center',
-                    ])}
-                  >
-                    <div
-                      className={cls(
-                        'text-gray-400',
-                        'border-gray-200',
-                        'group-hover:border-indigo-600',
-                        'group-hover:text-indigo-600',
-                        'flex',
-                        'h-6',
-                        'w-6',
-                        'shrink-0',
-                        'items-center',
-                        'justify-center',
-                        'rounded-lg',
-                        'border',
-                        'text-[0.625rem]',
-                        'font-medium',
-                        'bg-white',
-                      )}
-                    >
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <span className="truncate">{text}</span>
-                    {Count && (
-                      <Count
-                        sessionId={session.user.id}
-                        initialUnseenRequestCount={unseenRequestCount}
-                      />
-                    )}
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
-        </nav>
+        <div className="flex flex-1 flex-col">
+          <SidebarList title="Overview">
+            {sidebarOptions.map(({ href, text, Icon, Count }, i) => (
+              <SidebarLink href={href} key={i}>
+                <div
+                  className={cls(
+                    'text-gray-400',
+                    'border-gray-200',
+                    'group-hover:border-indigo-600',
+                    'group-hover:text-indigo-600',
+                    'flex',
+                    'h-6',
+                    'w-6',
+                    'shrink-0',
+                    'items-center',
+                    'justify-center',
+                    'rounded-lg',
+                    'border',
+                    'text-[0.625rem]',
+                    'font-medium',
+                    'bg-white',
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                </div>
+                <span className="truncate">{text}</span>
+                {Count && (
+                  <Count
+                    sessionId={session.user.id}
+                    initialUnseenRequestCount={unseenRequestCount}
+                  />
+                )}
+              </SidebarLink>
+            ))}
+          </SidebarList>
+        </div>
 
         <div className="-mx-6 mt-auto flex items-center">
           <div
@@ -146,7 +130,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
               'justify-between',
             )}
           >
-            <div className="relative h-8 w-8 bg-gray-50">
+            <div className="relative h-8 w-8">
               <Image
                 fill
                 referrerPolicy="no-referrer"
@@ -167,7 +151,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
 
           <SignOut className="aspect-square px-3 m-auto" />
         </div>
-      </div>
+      </nav>
       {children}
     </div>
   )

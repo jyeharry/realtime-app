@@ -1,4 +1,3 @@
-import { fetchRedis } from '@/helpers/redis'
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { addFriendValidator } from '@/lib/validations/add-friend'
@@ -17,7 +16,7 @@ export async function POST(req: Request) {
 
     const { email } = addFriendValidator.parse(body)
 
-    const idToAdd = await fetchRedis('get', `user:email:${email}`)
+    const idToAdd = await db.get<string>(`user:email:${email}`)
 
     if (!idToAdd) {
       return NextResponse.json(
@@ -34,12 +33,8 @@ export async function POST(req: Request) {
     }
 
     const [isAlreadyAdded, isAlreadyFriends] = await Promise.all([
-      fetchRedis(
-        'sismember',
-        `user:${idToAdd}:incoming_friend_requests`,
-        session.user.id,
-      ),
-      fetchRedis('sismember', `user:${session.user.id}:friends`, idToAdd),
+      db.sismember(`user:${idToAdd}:incoming_friend_requests`, session.user.id,),
+      db.sismember(`user:${session.user.id}:friends`, idToAdd),
     ])
 
     if (isAlreadyAdded) {
