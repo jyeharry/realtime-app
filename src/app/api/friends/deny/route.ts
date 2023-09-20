@@ -12,12 +12,12 @@ export async function POST(req: Request) {
 
     const session = await getServerSession(authOptions)
     if (!session) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ message: 'Unauthorised' }, { status: 401 })
     }
 
     await db.srem(`user:${session.user.id}:incoming_friend_requests`, newFriendId)
 
-    return new NextResponse('OK')
+    return NextResponse.json({ message: 'OK' })
   } catch (error) {
     console.log(error)
 

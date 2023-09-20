@@ -103,7 +103,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
                 >
                   <Icon className="h-4 w-4" />
                 </div>
-                <span className="truncate">{text}</span>
+                <p className="truncate">{text}</p>
                 {Count && (
                   <Count
                     sessionId={session.user.id}
@@ -130,22 +130,24 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
               'justify-between',
             )}
           >
-            <div className="relative h-8 w-8">
-              <Image
-                fill
-                referrerPolicy="no-referrer"
-                className="rounded-full"
-                src={session.user.image || ''}
-                alt="Your profile picture"
-              />
-            </div>
+            {session.user.image && (
+              <div className="relative h-8 w-8">
+                <Image
+                  fill
+                  referrerPolicy="no-referrer"
+                  className="rounded-full"
+                  src={session.user.image}
+                  alt="Your profile picture"
+                />
+              </div>
+            )}
 
             <span className="sr-only">Your profile</span>
             <div className="flex flex-col">
-              <span aria-hidden="true">{session.user.name}</span>
-              <span className="text-xs text-zinc-400" aria-hidden="true">
+              <p aria-hidden="true">{session.user.name}</p>
+              <p className="text-xs text-zinc-400" aria-hidden="true">
                 {session.user.email}
-              </span>
+              </p>
             </div>
           </div>
 

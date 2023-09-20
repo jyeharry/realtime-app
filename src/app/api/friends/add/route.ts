@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ message: 'Unauthorised' }, { status: 401 })
     }
 
     const body = await req.json()
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
 
     await db.sadd(`user:${idToAdd}:incoming_friend_requests`, session.user.id)
 
-    return new NextResponse('OK')
+    return NextResponse.json({ message: 'OK' })
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
