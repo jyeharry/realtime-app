@@ -1,6 +1,6 @@
 import { LucideProps } from 'lucide-react'
 
-export default (props: LucideProps) => (
+const Logo = (props: LucideProps) => (
   <svg {...props} viewBox="0 0 2000 2000">
     <path
       fill="currentColor"
@@ -8,3 +8,5 @@ export default (props: LucideProps) => (
     />
   </svg>
 )
+
+export default Logo

@@ -1,3 +1,5 @@
+import { Message } from "@/lib/validations/message"
+
 export interface User {
   name: string
   email: string
@@ -8,14 +10,6 @@ export interface User {
 export interface Chat {
   id: string
   message: Message[]
-}
-
-export interface Message {
-  id: string
-  senderId: string
-  receiverId: string
-  text: string
-  timestamp: number
 }
 
 export interface FriendRequest {

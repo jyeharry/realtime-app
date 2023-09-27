@@ -1,5 +1,7 @@
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { pusherServer } from '@/lib/pusher'
+import { toPusherKey } from '@/lib/utils'
 import { addFriendValidator } from '@/lib/validations/add-friend'
 import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
@@ -32,23 +34,32 @@ export async function POST(req: Request) {
       )
     }
 
-    const [isAlreadyAdded, isAlreadyFriends] = await Promise.all([
-      db.sismember(`user:${idToAdd}:incoming_friend_requests`, session.user.id,),
-      db.sismember(`user:${session.user.id}:friends`, idToAdd),
-    ])
+    const isAlreadyFriends = await db.sismember(
+      `user:${session.user.id}:friends`,
+      idToAdd,
+    )
 
-    if (isAlreadyAdded) {
+    if (isAlreadyFriends) {
+      return NextResponse.json({ message: 'Already friends' }, { status: 400 })
+    }
+
+    const sent = await db.sadd(
+      `user:${idToAdd}:incoming_friend_requests`,
+      session.user.id,
+    )
+
+    if (!sent) {
       return NextResponse.json(
         { message: 'Already added this user' },
         { status: 400 },
       )
     }
 
-    if (isAlreadyFriends) {
-      return NextResponse.json({ message: 'Already friends' }, { status: 400 })
-    }
-
-    await db.sadd(`user:${idToAdd}:incoming_friend_requests`, session.user.id)
+    pusherServer.trigger(
+      toPusherKey(`user:${idToAdd}:incoming_friend_requests`),
+      'incoming_friend_requests',
+      session.user,
+    )
 
     return NextResponse.json({ message: 'OK' })
   } catch (error) {

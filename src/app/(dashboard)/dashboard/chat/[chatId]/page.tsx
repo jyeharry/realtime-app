@@ -3,7 +3,7 @@ import Messages from '@/components/Messages'
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { messageArrayValidator } from '@/lib/validations/message'
-import { Message, User } from '@/types/db'
+import { User } from '@/types/db'
 import { getServerSession } from 'next-auth'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
@@ -49,6 +49,7 @@ const Page: FC<PageProps> = async ({ params: { chatId } }) => {
               fill
               referrerPolicy="no-referrer"
               src={chatPartner?.image || ''}
+              sizes='(max-width: 768px) 20vw, 2rem'
               alt={`${chatPartner?.name}'s profile picture`}
               className="rounded-full"
             />
@@ -63,7 +64,7 @@ const Page: FC<PageProps> = async ({ params: { chatId } }) => {
         </div>
       </div>
 
-      <Messages chatPartner={chatPartner} initialMessages={initialMessages} session={session} />
+      <Messages chatPartner={chatPartner} initialMessages={initialMessages} session={session} chatId={chatId} />
       <MessageInput chatId={chatId} chatPartner={chatPartner}/>
     </main>
   )

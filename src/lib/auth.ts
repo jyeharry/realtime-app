@@ -3,7 +3,16 @@ import { NextAuthOptions } from 'next-auth'
 import { db } from './db'
 import GoogleProvider from 'next-auth/providers/google'
 import { User } from '@/types/db'
-import env from './env'
+
+const getGoogleCredentials = () => {
+  const clientId = process.env.GOOGLE_CLIENT_ID
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET
+
+  if (!clientId) throw new Error('Missing GOOGLE_CLIENT_ID')
+  if (!clientSecret) throw new Error('Missing GOOGLE_CLIENT_SECRET')
+
+  return { clientId, clientSecret }
+}
 
 export const authOptions: NextAuthOptions = {
   adapter: UpstashRedisAdapter(db),
@@ -15,8 +24,8 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     GoogleProvider({
-      clientId: env.google.GOOGLE_CLIENT_ID,
-      clientSecret: env.google.GOOGLE_CLIENT_SECRET,
+      clientId: getGoogleCredentials().clientId,
+      clientSecret: getGoogleCredentials().clientSecret,
     }),
   ],
   callbacks: {

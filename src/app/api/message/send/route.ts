@@ -1,10 +1,12 @@
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { Message, messageValidator } from '@/lib/validations/message'
-import { User } from '@/types/db'
 import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
 import { nanoid } from 'nanoid'
+import { pusherServer } from '@/lib/pusher'
+import { toPusherKey } from '@/lib/utils'
+import { User } from '@/types/db'
 
 export const POST = async (req: Request) => {
   try {
@@ -26,18 +28,21 @@ export const POST = async (req: Request) => {
 
     const friendId = senderId === userId1 ? userId2 : userId1
 
-    const isFriend = db.sismember(`user:${senderId}:friends`, friendId)
-    if (!isFriend) {
+    const [isFriend, sender] = await Promise.all([
+      db.sismember(`user:${senderId}:friends`, friendId),
+      db.get<User>(`user:${senderId}`),
+    ])
+
+    if (!isFriend || !sender) {
       return NextResponse.json({ message: 'Unauthorised' }, { status: 401 })
     }
-
-    // const sender = await db.get<User>(`user:${senderId}`)
 
     const timestamp = Date.now()
 
     const messageData: Message = {
       id: nanoid(),
-      senderId: senderId,
+      sender,
+      receiverId: friendId,
       text,
       timestamp,
     }
@@ -48,6 +53,16 @@ export const POST = async (req: Request) => {
       score: timestamp,
       member: JSON.stringify(message),
     })
+
+    const channel = toPusherKey(`chat:${chatId}`)
+    const event = 'incoming-message'
+    pusherServer.trigger(channel, event, message)
+
+    pusherServer.trigger(
+      toPusherKey(`user:${friendId}:chats`),
+      'new_message',
+      message,
+    )
 
     return NextResponse.json({ message: 'OK' })
   } catch (error) {

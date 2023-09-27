@@ -137,6 +137,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
                   referrerPolicy="no-referrer"
                   className="rounded-full"
                   src={session.user.image}
+                  sizes='(max-width: 768px) 20vw, 2rem'
                   alt="Your profile picture"
                 />
               </div>
@@ -154,7 +155,9 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
           <SignOut className="aspect-square px-3 m-auto" />
         </div>
       </nav>
-      {children}
+      <aside className='max-h-screen container py-16 md:py-12 w-full'>
+        {children}
+      </aside>
     </div>
   )
 }

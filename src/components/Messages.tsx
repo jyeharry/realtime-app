@@ -1,27 +1,47 @@
 'use client'
 
-import { cls } from '@/lib/utils'
+import { cls, toPusherKey } from '@/lib/utils'
 import { Message } from '@/lib/validations/message'
-import { FC, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { format } from 'date-fns'
 import Image from 'next/image'
 import { User } from '@/types/db'
 import { Session } from 'next-auth'
+import { pusherClient } from '@/lib/pusher'
 
 interface MessagesProps {
   initialMessages: Message[]
   session: Session
   chatPartner: User
+  chatId: string
 }
 
 const Messages: FC<MessagesProps> = ({
   initialMessages,
   session,
   chatPartner,
+  chatId,
 }) => {
   const scrollDownRef = useRef<HTMLDivElement | null>(null)
   const [messages, setMessages] = useState<Message[]>(initialMessages)
   const formatTimestamp = (timestamp: number) => format(timestamp, 'HH:mm')
+  
+  useEffect(() => {
+    const channel = toPusherKey(`chat:${chatId}`)
+    const event = 'incoming-message'
+
+    const messageHandler = (newMessage: Message) => {
+      setMessages((prev) => [newMessage, ...prev])
+    }
+
+    pusherClient.subscribe(channel)
+    pusherClient.bind(event, messageHandler)
+
+    return () => {
+      pusherClient.unsubscribe(channel)
+      pusherClient.unbind(event, messageHandler)
+    }
+  }, [chatId])
 
   return (
     <div
@@ -43,8 +63,8 @@ const Messages: FC<MessagesProps> = ({
     >
       <div ref={scrollDownRef} />
       {messages.map((msg, i) => {
-        const isCurrentUser = msg.senderId === session.user.id
-        const hasFollowingMessage = messages[i - 1]?.senderId === msg.senderId
+        const isCurrentUser = msg.sender.id === session.user.id
+        const hasFollowingMessage = messages[i - 1]?.sender.id === msg.sender.id
 
         return (
           <div key={i} className="chat-message">
@@ -88,6 +108,7 @@ const Messages: FC<MessagesProps> = ({
                     src={
                       isCurrentUser ? session.user.image! : chatPartner.image!
                     }
+                    sizes='(max-width: 768px) 20vw, 1.5rem'
                     alt={`${
                       isCurrentUser ? 'Your' : chatPartner.name + "'s"
                     } profile picture`}
