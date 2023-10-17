@@ -37,7 +37,7 @@ const Page: FC<PageProps> = async ({ params: { chatId } }) => {
   const chatPartnerId = user.id === userId1 ? userId2 : userId1
   const chatPartner = await db.get<User>(`user:${chatPartnerId}`)
   if (!chatPartner) notFound()
-  
+
   const initialMessages = await getChatMessages(chatId)
 
   return (
@@ -49,7 +49,7 @@ const Page: FC<PageProps> = async ({ params: { chatId } }) => {
               fill
               referrerPolicy="no-referrer"
               src={chatPartner?.image || ''}
-              sizes='(max-width: 768px) 20vw, 2rem'
+              sizes="(max-width: 768px) 20vw, 2rem"
               alt={`${chatPartner?.name}'s profile picture`}
               className="rounded-full"
             />
@@ -64,8 +64,13 @@ const Page: FC<PageProps> = async ({ params: { chatId } }) => {
         </div>
       </div>
 
-      <Messages chatPartner={chatPartner} initialMessages={initialMessages} session={session} chatId={chatId} />
-      <MessageInput chatId={chatId} chatPartner={chatPartner}/>
+      <Messages
+        chatPartner={chatPartner}
+        initialMessages={initialMessages}
+        session={session}
+        chatId={chatId}
+      />
+      <MessageInput chatId={chatId} chatPartner={chatPartner} />
     </main>
   )
 }

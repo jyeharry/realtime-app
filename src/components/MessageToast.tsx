@@ -20,10 +20,7 @@ const MessageToast: FC<MessageToastProps> = ({
     <div
       className={cls(
         'max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5',
-        {
-          'animate-enter': messageToast.visible,
-          'animate-leave': !messageToast.visible,
-        },
+        messageToast.visible ? 'animate-enter' : 'animate-leave',
       )}
     >
       <Link
@@ -47,7 +44,9 @@ const MessageToast: FC<MessageToastProps> = ({
           </div>
 
           <div className="ml-3 flex-1">
-            <p className="text-sm font-medium text-gray-900">{message.sender.name}</p>
+            <p className="text-sm font-medium text-gray-900">
+              {message.sender.name}
+            </p>
             <p className="mt-1 text-sm text-gray-500">{message.text}</p>
           </div>
         </div>

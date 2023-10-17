@@ -42,6 +42,12 @@ export async function POST(req: Request) {
       db.srem(`user:${session.user.id}:incoming_friend_requests`, newFriendId),
     ])
 
+    // pusherServer.trigger(
+    //   toPusherKey(`user:${session.user.id}:incoming_friend_requests`),
+    //   'incoming_friend_requests',
+    //   null,
+    // )
+
     return NextResponse.json({ message: 'OK' })
   } catch (error) {
     console.log(error)
