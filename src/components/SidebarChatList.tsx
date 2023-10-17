@@ -65,7 +65,7 @@ const SidebarChatList: FC<SidebarChatListProps> = ({ friends, session }) => {
       pusherClient.unbind(chatEvent, chatHandler)
       pusherClient.unbind(friendEvent, newFriendHandler)
     }
-  }, [path, session.user.id])
+  }, [path, session.user.id, router])
 
   useEffect(() => {
     if (path?.includes('chat')) {
