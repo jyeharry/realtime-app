@@ -61,6 +61,12 @@ export async function POST(req: Request) {
       session.user,
     )
 
+    pusherServer.trigger(
+      toPusherKey(`user:${idToAdd}:incoming_friend_requests_change`),
+      'incoming_friend_requests_change',
+      1,
+    )
+
     return NextResponse.json({ message: 'OK' })
   } catch (error) {
     if (error instanceof z.ZodError) {

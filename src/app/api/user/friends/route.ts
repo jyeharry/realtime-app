@@ -1,31 +1,19 @@
+import { getFriendsByUserId } from '@/helpers/getFriendsByUserId'
 import { authOptions } from '@/lib/auth'
-import { db } from '@/lib/db'
-import { pusherServer } from '@/lib/pusher'
-import { toPusherKey } from '@/lib/utils'
 import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
-export async function POST(req: Request) {
+export async function GET() {
   try {
-    const body = await req.json()
-
-    const { id: newFriendId } = z.object({ id: z.string() }).parse(body)
-
     const session = await getServerSession(authOptions)
     if (!session) {
       return NextResponse.json({ message: 'Unauthorised' }, { status: 401 })
     }
 
-    await db.srem(`user:${session.user.id}:incoming_friend_requests`, newFriendId)
+    const friends = await getFriendsByUserId(session.user.id)
 
-    pusherServer.trigger(
-      toPusherKey(`user:${session.user.id}:incoming_friend_requests_change`),
-      'incoming_friend_requests_change',
-      -1,
-    )
-
-    return NextResponse.json({ message: 'OK' })
+    return NextResponse.json({ data: { friends } })
   } catch (error) {
     console.log(error)
 

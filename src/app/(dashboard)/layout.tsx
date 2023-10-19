@@ -46,11 +46,9 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
 
   const friends = await getFriendsByUserId(session.user.id)
 
-  const unseenRequestCount = (
-    await db.smembers<string[]>(
-      `user:${session.user.id}:incoming_friend_requests`,
-    )
-  ).length
+  const unseenRequestCount = await db.scard(
+    `user:${session.user.id}:incoming_friend_requests`,
+  )
 
   return (
     <div className="w-full flex h-screen">
@@ -137,7 +135,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
                   referrerPolicy="no-referrer"
                   className="rounded-full"
                   src={session.user.image}
-                  sizes='(max-width: 768px) 20vw, 2rem'
+                  sizes="(max-width: 768px) 20vw, 2rem"
                   alt="Your profile picture"
                 />
               </div>
@@ -155,7 +153,7 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
           <SignOut className="aspect-square px-3 m-auto" />
         </div>
       </nav>
-      <aside className='max-h-screen container py-16 md:py-12 w-full'>
+      <aside className="max-h-screen container py-16 md:py-12 w-full">
         {children}
       </aside>
     </div>

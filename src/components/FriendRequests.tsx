@@ -37,7 +37,6 @@ const FriendRequests: FC<FriendRequestsProps> = ({
       body: JSON.stringify({ id: senderId }),
     })
     setFriendRequests((prev) => prev.filter((user) => user.id !== senderId))
-    router.refresh()
   }
 
   useEffect(() => {

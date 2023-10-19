@@ -16,14 +16,18 @@ const FriendRequestLink: FC<FriendRequestLinkProps> = ({
   const [unseenRequestCount, setUnseenRequestCount] = useState(
     initialUnseenRequestCount,
   )
-  
+
   useEffect(() => {
-    const channel = toPusherKey(`user:${sessionId}:incoming_friend_requests`)
+    const channel = toPusherKey(
+      `user:${sessionId}:incoming_friend_requests_change`,
+    )
 
-    const event = 'incoming_friend_requests'
+    const event = 'incoming_friend_requests_change'
 
-    const friendRequestHandler = () => {
-      setUnseenRequestCount((prev) => prev + 1)
+    const friendRequestHandler = (delta: number) => {
+      setUnseenRequestCount((prev) =>
+        (delta === -1 && prev > 0) || delta === 1 ? prev + delta : prev,
+      )
     }
 
     pusherClient.subscribe(channel)
