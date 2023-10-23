@@ -48,6 +48,12 @@ export async function POST(req: Request) {
       -1,
     )
 
+    pusherServer.trigger(
+      toPusherKey(`user:${newFriendId}:friends`),
+      'new_friend',
+      null,
+    )
+
     return NextResponse.json({ message: 'OK' })
   } catch (error) {
     console.log(error)
