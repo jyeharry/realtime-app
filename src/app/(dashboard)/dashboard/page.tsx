@@ -1,10 +1,10 @@
-import { getFriendsByUserId } from '@/helpers/getFriendsByUserId'
-import { authOptions } from '@/lib/auth'
-import { db } from '@/lib/db'
+'use client'
+
 import { buildChatHref } from '@/lib/utils'
-import { Message } from '@/lib/validations/message'
+import { User } from '@/types/db'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { ChevronRight } from 'lucide-react'
-import { getServerSession } from 'next-auth'
+import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -12,38 +12,43 @@ import { FC } from 'react'
 
 interface PageProps {}
 
-const Page: FC<PageProps> = async ({}) => {
-  const session = await getServerSession(authOptions)
+const Page: FC<PageProps> = ({}) => {
+  const { data: session } = useSession()
   if (!session) notFound()
+  const { data: friendsWithLastMessage } = useSuspenseQuery({
+    queryKey: ['dashboard', 'friendsWithLastMessage'],
+    queryFn: async () => {
+      const friendsData = await (await fetch('/api/user/friends')).json()
 
-  const friends = await getFriendsByUserId(session.user.id)
+      return await Promise.all(
+        friendsData.friends.map(async (friend: User) => {
+          const messagesData = await (
+            await fetch(
+              `/api/chat/${buildChatHref(
+                session.user.id,
+                friend.id,
+              )}/messages?start=-1&end=-1`,
+            )
+          ).json()
 
-  const friendsWithLastMessage = await Promise.all(
-    friends.map((friend) =>
-      db
-        .zrange<Message[]>(
-          `chat:${buildChatHref(
-            '1e7c72c8-9bf6-4364-a9d7-aedfc71c2be3',
-            '7a8d4c1e-99b4-41a4-a2a9-3f906a725b39',
-          )}:messages`,
-          -1,
-          -1,
-        )
-        .then(([lastMessage]) => ({ ...friend, lastMessage })),
-    ),
-  )
+          return { ...friend, lastMessage: messagesData.messages[0] }
+        }),
+      )
+    },
+  })
 
   return (
     <div className="container py-12">
       <h1 className="font-bold text-5xl mb-8">Recent chats</h1>
-      {friendsWithLastMessage.length ? (
-        friendsWithLastMessage.map((friend) => (
-          <Link
+      {friendsWithLastMessage?.length ? (
+        friendsWithLastMessage.map((friend, i) => (
+          <a
             href={`/dashboard/chat/${buildChatHref(
               session.user.id,
               friend.id,
             )}`}
             className="relative block bg-zinc-50 border border-zinc-200 p-3 rounded-md"
+            key={i}
           >
             <div className="absolute right-4 inset-y-0 flex items-center">
               <ChevronRight className="h-7 w-7 text-zinc-400" />
@@ -75,7 +80,7 @@ const Page: FC<PageProps> = async ({}) => {
                 </p>
               </div>
             </div>
-          </Link>
+          </a>
         ))
       ) : (
         <p className="text-sm text-zinc-500">Nothing to show here...</p>

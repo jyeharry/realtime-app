@@ -25,6 +25,8 @@ const getChatMessages = async (chatId: string) => {
   }
 }
 
+export const revalidate = 0
+
 const Page: FC<PageProps> = async ({ params: { chatId } }) => {
   const session = await getServerSession(authOptions)
   if (!session) notFound()

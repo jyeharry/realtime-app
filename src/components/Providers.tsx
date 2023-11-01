@@ -3,18 +3,23 @@
 import { FC, ReactNode } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { SessionProvider } from 'next-auth/react'
+import { Session } from 'next-auth'
 
-const queryClient = new QueryClient()
+export const queryClient = new QueryClient()
 
 interface ProvidersProps {
   children: ReactNode
+  session: Session | null
 }
 
-const Providers: FC<ProvidersProps> = ({ children }) => {
+const Providers: FC<ProvidersProps> = ({ children, session }) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster position="top-center" />
-      {children}
+      <SessionProvider session={session}>
+        <Toaster position="top-center" />
+        {children}
+      </SessionProvider>
     </QueryClientProvider>
   )
 }

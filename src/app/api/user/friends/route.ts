@@ -13,7 +13,7 @@ export async function GET() {
 
     const friends = await getFriendsByUserId(session.user.id)
 
-    return NextResponse.json({ data: { friends } })
+    return NextResponse.json({ friends })
   } catch (error) {
     console.log(error)
 
