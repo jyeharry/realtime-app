@@ -10,7 +10,7 @@ import Image from 'next/image'
 import { Session } from 'next-auth'
 import { pusherClient } from '@/lib/pusher'
 import { toast } from 'react-hot-toast'
-import MessageToast from './MessageToast'
+import MessageToast from '../MessageToast'
 import { Message } from '@/lib/validations/message'
 
 interface SidebarChatListProps {

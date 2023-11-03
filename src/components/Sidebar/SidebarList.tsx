@@ -1,6 +1,6 @@
 import { cls } from '@/lib/utils'
 import { FC, ReactNode } from 'react'
-import Subtitle from './Subtitle'
+import Subtitle from '../Subtitle'
 
 interface SidebarListProps {
   children: ReactNode
