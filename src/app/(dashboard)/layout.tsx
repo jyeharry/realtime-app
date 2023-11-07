@@ -24,9 +24,18 @@ const DashboardLayout: FC<DashboardLayoutProps> = async ({ children }) => {
   return (
     <div className="w-full flex h-screen">
       <MobileSidebarContainer>
-        <Sidebar friends={friends} unseenRequestCount={unseenRequestCount} session={session}/>
+        <Sidebar
+          friends={friends}
+          unseenRequestCount={unseenRequestCount}
+          session={session}
+        />
       </MobileSidebarContainer>
-      <Sidebar className='hidden md:flex' friends={friends} unseenRequestCount={unseenRequestCount} session={session}/>
+      <Sidebar
+        className="hidden md:flex"
+        friends={friends}
+        unseenRequestCount={unseenRequestCount}
+        session={session}
+      />
       <aside className="max-h-screen py-16 md:py-0 md:pb-12 w-full">
         {children}
       </aside>

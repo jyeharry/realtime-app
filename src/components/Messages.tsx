@@ -25,7 +25,7 @@ const Messages: FC<MessagesProps> = ({
   const scrollDownRef = useRef<HTMLDivElement | null>(null)
   const [messages, setMessages] = useState<Message[]>(initialMessages)
   const formatTimestamp = (timestamp: number) => format(timestamp, 'HH:mm')
-  
+
   useEffect(() => {
     const channel = toPusherKey(`chat:${chatId}`)
     const event = 'incoming-message'
@@ -51,8 +51,8 @@ const Messages: FC<MessagesProps> = ({
         'h-full',
         'flex-1',
         'flex-col-reverse',
-        'gap-4',
-        'p-4',
+        'gap-px',
+        'py-4',
         'overflow-y-auto',
         'scrollbar-thumb-blue',
         'scrollbar-thumb-rounded',
@@ -64,51 +64,55 @@ const Messages: FC<MessagesProps> = ({
       <div ref={scrollDownRef} />
       {messages.map((msg, i) => {
         const isCurrentUser = msg.sender.id === session.user.id
+        const hasPrecedingMessage = messages[i + 1]?.sender.id === msg.sender.id
         const hasFollowingMessage = messages[i - 1]?.sender.id === msg.sender.id
 
         return (
-          <div key={i} className="chat-message">
+          <div
+            key={i}
+            className={cls('flex items-end container', {
+              'justify-end': isCurrentUser,
+              'mt-4': !hasPrecedingMessage,
+            })}
+          >
             <div
-              className={cls('flex items-end', {
-                'justify-end': isCurrentUser,
-              })}
+              className={cls(
+                'flex flex-col space-y-2 text-base max-w-xs mx-2',
+                isCurrentUser ? 'order-1 items-end' : 'order-2 items-start',
+              )}
             >
-              <div
-                className={cls(
-                  'flex flex-col space-y-2 text-base max-w-xs mx-2',
-                  isCurrentUser ? 'order-1 items-end' : 'order-2 items-start',
-                )}
-              >
-                <p
-                  className={cls('px-4 py-2 rounded-lg inline-block', {
-                    'bg-indigo-600 text-white': isCurrentUser,
-                    'bg-gray-200 text-gray-900': !isCurrentUser,
-                    'rounded-br-none': !hasFollowingMessage && isCurrentUser,
-                    'rounded-bl-none': !hasFollowingMessage && !isCurrentUser,
-                  })}
-                >
-                  {msg.text}{' '}
-                  <span className="ml-2 text-xs text-gray-400">
-                    {formatTimestamp(msg.timestamp)}
-                  </span>
-                </p>
-              </div>
-
-              <div
-                className={cls('relative w-6 h-6', {
-                  'order-2': isCurrentUser,
-                  'order-1': !isCurrentUser,
-                  invisible: hasFollowingMessage,
+              <p
+                className={cls('px-4 py-2 rounded-lg inline-block', {
+                  'bg-indigo-600 text-white': isCurrentUser,
+                  'bg-gray-200 text-gray-900': !isCurrentUser,
+                  'rounded-tr-sm': hasPrecedingMessage && isCurrentUser,
+                  'rounded-br-sm': hasFollowingMessage && isCurrentUser,
+                  'rounded-tl-sm': hasPrecedingMessage && !isCurrentUser,
+                  'rounded-bl-sm': hasFollowingMessage && !isCurrentUser,
                 })}
               >
-                {((isCurrentUser && session.user.image) ||
+                {msg.text}{' '}
+                <span className="ml-2 text-xs text-gray-400">
+                  {formatTimestamp(msg.timestamp)}
+                </span>
+              </p>
+            </div>
+
+            <div
+              className={cls('relative w-6 h-6', {
+                'order-2': isCurrentUser,
+                'order-1': !isCurrentUser,
+              })}
+            >
+              {!hasFollowingMessage &&
+                ((isCurrentUser && session.user.image) ||
                   (!isCurrentUser && chatPartner.image)) && (
                   <Image
                     fill
                     src={
                       isCurrentUser ? session.user.image! : chatPartner.image!
                     }
-                    sizes='(max-width: 768px) 20vw, 1.5rem'
+                    sizes="(max-width: 768px) 20vw, 1.5rem"
                     alt={`${
                       isCurrentUser ? 'Your' : chatPartner.name + "'s"
                     } profile picture`}
@@ -116,7 +120,6 @@ const Messages: FC<MessagesProps> = ({
                     className="rounded-full"
                   />
                 )}
-              </div>
             </div>
           </div>
         )

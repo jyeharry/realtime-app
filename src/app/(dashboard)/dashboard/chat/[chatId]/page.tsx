@@ -17,9 +17,13 @@ interface PageProps {
 
 const getChatMessages = async (chatId: string) => {
   try {
-    const messages: string[] = await db.zrange(`chat:${chatId}:messages`, 0, -1)
-    const reversedMessages = messages.reverse()
-    return messageArrayValidator.parse(reversedMessages)
+    const messages: string[] = await db.zrange(
+      `chat:${chatId}:messages`,
+      0,
+      -1,
+      { rev: true },
+    )
+    return messageArrayValidator.parse(messages)
   } catch (error) {
     notFound()
   }
@@ -44,8 +48,8 @@ const Page: FC<PageProps> = async ({ params: { chatId } }) => {
 
   return (
     <main className="flex-1 justify-between flex flex-col h-full max-h-[calc(100vh - 6rem)]">
-      <div className="flex sm:items-center justify-between p-4 border-b-2 border-gray-200">
-        <div className="relative flex items-center gap-4">
+      <div className="flex sm:items-center justify-between py-2 sm:py-4 border-b border-gray-200">
+        <div className="relative flex items-center gap-4 container">
           <div className="relative w-8 sm:w-12 h-8 sm:h-12">
             <Image
               fill
