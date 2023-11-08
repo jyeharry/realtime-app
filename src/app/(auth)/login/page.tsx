@@ -5,6 +5,7 @@ import { cls } from '@/lib/utils'
 import Button from '@/components/ui/Button'
 import { signIn } from 'next-auth/react'
 import { toast } from 'react-hot-toast'
+import Logo from '@/components/Logo'
 
 interface PageProps {}
 
@@ -25,7 +26,7 @@ const Page: FC<PageProps> = ({}) => {
     <div
       className={cls([
         'flex',
-        'min-h-full',
+        'min-h-screen',
         'items-center',
         'justify-center',
         'py-12',
@@ -42,10 +43,11 @@ const Page: FC<PageProps> = ({}) => {
           'items-center',
           'max-w-md',
           'space-y-8',
+          'mb-48'
         ])}
       >
         <div className={cls(['flex', 'flex-col', 'items-center', 'gap-8'])}>
-          logo
+          <Logo className="h-16 text-indigo-600" />
           <h2
             className={cls([
               'mt-6',
