@@ -58,7 +58,7 @@ const Page: FC<PageProps> = ({}) => {
               'text-gray-900',
             ])}
           >
-            Sign into your account
+            Sign in to your account
           </h2>
         </div>
 
